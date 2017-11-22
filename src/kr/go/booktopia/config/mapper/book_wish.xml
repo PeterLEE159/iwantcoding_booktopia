@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookWish">
+
+	<typeAlias alias="BookWish" type="kr.go.booktopia.vo.BookWish"/>
+	<typeAlias alias="WishCriteria" type="kr.go.booktopia.vo.WishCriteria"/>
+	
+	<select id="getTotalRows" parameterClass="WishCriteria" resultClass="int">
+		select count(*)
+		from book_wish A, users B
+		where A.user_id = B.id
+			  <dynamic>
+				<isNotEmpty prepend="and" property="keyword">
+					<isEqual property="opt" compareValue="bookname">
+					book_name like '%' || #keyword# || '%'
+				</isEqual>
+				<isEqual property="opt" compareValue="username">
+					name like '%' || #keyword# || '%'
+					</isEqual>
+				</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getBookWishs" parameterClass="WishCriteria" resultClass="BookWish">
+		
+		select id				as id,
+				name			as "user.name",
+				book_name		as bookName,
+				writer			as writer,
+				publisher		as publisher,
+				CREATED_AT		as createdAt,
+				ACCEPTED		as accepted
+			
+		from (select row_number() over (order by A.id desc) rn, 
+		      A.id, B.name, A.book_name, A.writer, A.publisher, A.CREATED_AT, A.ACCEPTED
+			  from book_wish A, users B
+			  where A.user_id = B.id
+			  <dynamic>
+<!-- 			  	dynamic = if -->
+				<isNotEmpty prepend="and" property="keyword">
+					<isEqual property="opt" compareValue="bookname">
+						book_name like '%' || #keyword# || '%'
+<!-- 						검색후에 검색창에 검색어가 남아있음							 -->
+					</isEqual>
+					<isEqual property="opt" compareValue="username">
+						name like '%' || #keyword# || '%'
+					</isEqual>
+				</isNotEmpty>
+			</dynamic>
+			  )
+		where rn >= #beginIndex# and rn &lt;= #endIndex#
+	</select>
+		
+		
+	<insert id="create" parameterClass="BookWish">
+		insert into
+			book_wish (ID, book_name, writer, publisher, USER_ID)
+		values (
+			SEQ_BOOK_WISH.NEXTVAL,
+			#bookName#,			
+			#writer#,
+			#publisher#,
+			#user.id#			
+		)
+	</insert>
+	
+	<select id="list" parameterClass="wishCriteria" resultClass="BookWish">
+		select
+			A.id			as id,
+			B.name			as "user.name",
+			A.book_name		as bookName,
+			A.writer		as writer,
+			A.publisher		as publisher,
+			A.CREATED_AT	as createdAt,
+			A.ACCEPTED		as accepted
+		from
+			book_wish A, users B
+		where
+			A.user_id = B.id;					
+	</select>	
+	
+	<update id="bookWishCheckOk" parameterClass="int">
+		update
+			book_wish
+		set
+			accepted = 'Y'
+		where
+			id = #id#
+	</update>	
+	<update id="bookWishCheckNo" parameterClass="int">
+		update
+			book_wish
+		set
+			accepted = 'N'
+		where
+			id = #id#
+	</update>	
+</sqlMap>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="Announcement">
+	<typeAlias alias="Announcement" type="kr.go.booktopia.vo.Announcement"/>
+	
+	<insert id="create" parameterClass="Announcement">
+		insert into
+			announcements (ID, TITLE, "CONTENT", EMERGENCY, ADMIN_ID)
+		values
+			(SEQ_ANNOUNCEMENT.NEXTVAL, #title#, #content#, #charIsEmergency#, #admin.id#)
+	</insert>
+	
+	<select id="getTotalRows" parameterClass="Criteria" resultClass="int">
+		select count(*)
+		from announcements A, users U
+		where A.admin_id = U.id
+		<dynamic>
+			<isNotNull property="opt">
+				<isNotNull property="keyword">
+					<isEqual property="opt" compareValue="title">
+						and Q.title like '%' || #keyword# || '%'
+					</isEqual>
+					<isEqual property="opt" compareValue="writer">
+						and U.name like '%' || #keyword# || '%'
+					</isEqual>
+				</isNotNull>
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<select id="read" parameterClass="int" resultClass="Announcement">
+		select 
+			A.id						as id,
+			A.title						as title,
+			A.content					as content,
+			A.view_count				as viewCount,
+			A.emergency					as charIsEmergency,
+			A.active					as charIsActive,
+			A.updated_at				as updatedAt,
+			A.created_at				as createdAt,
+			U.id						as "admin.id",
+			U.name						as "admin.name"
+		from
+			announcements A, users U
+		where 
+			A.id = #value# and
+			A.admin_id = U.id(+)
+	</select>
+	
+	<select id="list" parameterClass="Criteria" resultClass="Announcement">
+		select id, title, content, viewCount, charIsEmergency, charIsActive, updatedAt, createdAt, "admin.id", "admin.name"
+		from (select row_number() over (order by createdAt desc) rn,
+					 id, title, content, viewCount, charIsEmergency, charIsActive, updatedAt, createdAt, "admin.id", "admin.name"
+				from (select
+					A.id						as id,
+					A.title						as title,
+					A.content					as content,
+					A.view_count				as viewCount,
+					A.emergency					as charIsEmergency,
+					A.active					as charIsActive,
+					A.updated_at				as updatedAt,
+					A.created_at				as createdAt,
+					U.id						as "admin.id",
+					U.name						as "admin.name"
+				from
+					announcements A, users U
+				where
+					A.admin_id = U.id
+					and A.active = 'Y'
+					<dynamic>
+							<isNotNull property="opt">
+								<isNotNull property="keyword">
+									<isEqual property="opt" compareValue="title">
+										and A.title like '%' || #keyword# || '%'
+									</isEqual>
+									<isEqual property="opt" compareValue="writer">
+										and U.name like '%' || #keyword# || '%'
+									</isEqual>
+								</isNotNull>
+							</isNotNull>
+						</dynamic>
+				order by A.created_at desc))
+		where rn >=#beginIndex# and rn &lt;=#endIndex#
+	</select>
+	
+	<select id="getNotices" parameterClass="Criteria" resultClass="Announcement">
+		select id, title, content, viewCount, charIsEmergency, charIsActive, updatedAt, createdAt, "admin.id", "admin.name"
+		from (select row_number() over (order by createdAt desc) rn,
+					 id, title, content, viewCount, charIsEmergency, charIsActive, updatedAt, createdAt, "admin.id", "admin.name"
+				from (select
+							A.id						as id,
+							A.title						as title,
+							A.content					as content,
+							A.view_count				as viewCount,
+							A.emergency					as charIsEmergency,
+							A.active					as charIsActive,
+							A.updated_at				as updatedAt,
+							A.created_at				as createdAt,
+							U.id						as "admin.id",
+							U.name						as "admin.name"
+						from
+							announcements A, users U
+						where
+							A.admin_id = U.id
+							and A.EMERGENCY = 'Y'
+							and A.active = 'Y'))
+			where rn >=#beginIndex# and rn &lt;=#endIndex#
+	</select>
+	
+	<update id="update" parameterClass="Announcement">
+		update
+			announcements
+		set
+			TITLE = #title#,
+			CONTENT = #content#,
+			EMERGENCY = #charIsEmergency#,
+			VIEW_COUNT = #viewCount#,
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="Announcement">
+		update
+			announcements
+		set
+			active = 'N'
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="Announcement">
+		update
+			announcements
+		set
+			active = 'Y'
+		where
+			id = #id#
+	</update>
+	
+</sqlMap>

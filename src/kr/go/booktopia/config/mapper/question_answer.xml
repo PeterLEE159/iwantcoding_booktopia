@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="QuestionAnswer">
+	<typeAlias alias="QuestionAnswer" type="kr.go.booktopia.vo.QuestionAnswer"/>
+	
+	<insert id="create" parameterClass="QuestionAnswer">
+		insert into
+			question_answers (ID, "CONTENT", QUESTION_ID, ADMIN_ID)
+		values
+			(SEQ_QUESTION_ANSWER.NEXTVAL, #content#, #questionId#, #admin.id#)
+	</insert>
+	
+	<select id="read" parameterClass="int" resultClass="QuestionAnswer">
+		select 
+			A.id						as id,
+			A.content					as content,
+			A.active					as charIsActive,
+			A.updated_at				as updatedAt,
+			A.created_at				as createdAt,
+			A.question_id				as questionId,
+			U.id						as "admin.id",
+			U.name						as "admin.name"
+		from
+			question_answers A, users U
+		where 
+			A.question_id = #value# 
+			and A.admin_id = U.id(+)
+			and A.active = 'Y'
+	</select>
+	
+	<select id="getLatestAnswer" parameterClass="int" resultClass="QuestionAnswer">
+		select 
+			A.id						as id,
+			A.content					as content,
+			A.active					as charIsActive,
+			A.updated_at				as updatedAt,
+			A.created_at				as createdAt,
+			A.question_id			as questionId,
+			U.id						as "admin.id",
+			U.name					as "admin.name"
+		from
+			question_answers A, users U, QUESTIONS Q
+		where 
+			A.question_id = #value# 
+			and A.admin_id = U.id(+)
+			and A.question_id(+) = Q.id
+			and A.created_at = (select max(created_at)
+											from question_answers
+											where question_id = #value#)
+	</select>
+	
+	<update id="update" parameterClass="QuestionAnswer">
+		update
+			question_answers
+		set
+			CONTENT = #content#,
+			UPDATED_AT = sysdate,
+			admin_id = #admin.id#
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="QuestionAnswer">
+		update
+			question_answers
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="QuestionAnswer">
+		update
+			question_answers
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+</sqlMap>

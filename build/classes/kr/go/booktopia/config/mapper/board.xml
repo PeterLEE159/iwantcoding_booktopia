@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="Board">
+	<typeAlias alias="Board" type="kr.go.booktopia.vo.Board"/>
+	
+	<insert id="create" parameterClass="Board">
+		insert into
+			boards (ID, TITLE, CONTENT, USER_ID)
+		values
+			(SEQ_BOARD.NEXTVAL, #title#, #content#, #user.id#)
+	</insert>
+	
+	<select id="read" parameterClass="int" resultClass="Board">
+		select 
+			B.id						as id,
+			B.title						as title,
+			B.content					as content,
+			B.view_count				as viewCount,
+			B.active					as charIsActive,
+			B.updated_at				as updatedAt,
+			B.created_at				as createdAt,
+			U.id						as "user.id",
+			U.name						as "user.name"
+		from
+			boards B, users U
+		where 
+			B.id = #value# and
+			B.user_id = U.id(+)
+	</select>
+	
+	<update id="update" parameterClass="Board">
+		update
+			boards
+		set
+			TITLE = #title#,
+			CONTENT = #content#,
+			VIEW_COUNT = #viewCount#,
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="Board">
+		update
+			boards
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="Board">
+		update
+			boards
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+</sqlMap>

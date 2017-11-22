@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookRental">
+
+	<typeAlias alias="BookRental" type="kr.go.booktopia.vo.BookRental"/>
+	<typeAlias alias="Criteria" type="kr.go.booktopia.vo.Criteria"/>
+	<typeAlias alias="PagingCriteria" type="kr.go.booktopia.vo.PagingCriteria"/>
+	
+	<insert id="create" parameterClass="BookRental">
+		insert into
+			book_rentals (ID, RENTAL_DATE, EXPECTED_RETURN_DATE, ACTUAL_RETURN_DATE, USER_ID, BOOK_ID )
+		values (
+			SEQ_BOOK_RENTAL.NEXTVAL,
+			sysdate,
+			sysdate + 7,
+			null,
+			#user.id#,
+			#book.id#
+		)
+	</insert>
+	
+	<select id="list" parameterClass="Criteria" resultClass="BookRental">
+		select
+			A.id						as id,
+			A.rental_date				as rentalDate,
+			A.expected_return_date		as expectedReturnDate,
+			A.actual_return_date		as actualReturnDate,
+			A.extra_delay_count			as extraDelayCount,
+			B.name						as "book.name",
+			trunc(sysdate - A.expected_return_date) as delayDate,
+			A.user_id					as "user.id"			
+		from
+			book_rentals A, books B
+		where A.book_id = B.id		
+		<dynamic>
+			<isNotNull property="userId">
+				and A.user_id = #userId#		
+			</isNotNull>
+		</dynamic>
+	</select>	
+	
+	<select id="count"  parameterClass="PagingCriteria"  resultClass="int">
+		select
+			count(*)
+		from 
+			book_rentals	
+		<dynamic>			
+			<isEqual property="type" compareValue="R">
+				where actual_return_date is  null
+			</isEqual>
+			<isEqual property="type" compareValue="N">
+				where actual_return_date is not null
+			</isEqual>			
+		</dynamic>
+	</select>
+	
+	<select id="countById"  parameterClass="PagingCriteria"  resultClass="int">
+		select
+			count(*)
+		from 
+			book_rentals
+		where user_id = #userId#	
+		<dynamic>			
+			<isEqual property="type" compareValue="R">
+				and actual_return_date is  null
+			</isEqual>
+			<isEqual property="type" compareValue="N">
+				and actual_return_date is not null
+			</isEqual>				
+		</dynamic>
+	</select>
+	
+	<select id="getBoardPagingByType" parameterClass="PagingCriteria" resultClass="BookRental">
+
+		select
+			id, rentalDate, expectedReturnDate, actualReturnDate, extraDelayCount, "book.name", delayDate, "user.id", "user.name"
+		from (select row_number() over (order by rentalDate asc) rn, 
+			  	id, rentalDate, expectedReturnDate, actualReturnDate, extraDelayCount, "book.name", delayDate, "user.id", "user.name"
+			  from (select
+						A.id						as id,
+						A.rental_date				as rentalDate,
+						A.expected_return_date		as expectedReturnDate,
+						A.actual_return_date		as actualReturnDate,
+						A.extra_delay_count			as extraDelayCount,
+						B.name						as "book.name",
+						trunc(sysdate - A.expected_return_date) as delayDate,
+						A.user_id					as "user.id",
+						C.name						as "user.name"			
+					from book_rentals A, books B, users C
+					where A.book_id = B.id
+					and A.user_id = C.id
+					<dynamic>					
+						<isEqual property="type" compareValue="R">
+							and A.actual_return_date is  null
+						</isEqual>
+						<isEqual property="type" compareValue="N">
+							and A.actual_return_date is not null
+						</isEqual>															
+					</dynamic>
+					)
+			)
+		where rn >= #beginIndex# and rn &lt;= #endIndex#
+	</select>
+
+	<select id="getBoardPagingById" parameterClass="PagingCriteria" resultClass="BookRental">
+		select 
+			A.id						as id,
+			A.rental_date				as rentalDate,
+			A.expected_return_date		as expectedReturnDate,
+			A.actual_return_date		as actualReturnDate,
+			A.extra_delay_count			as extraDelayCount,
+			B.name						as "book.name"
+		from (select row_number() over (order by id asc) rn,
+				id, rental_date, expected_return_date, actual_return_date, extra_delay_count, book_id
+			  from BOOK_RENTALS
+			  where user_id = #userId#
+			  <dynamic>					
+				<isEqual property="type" compareValue="R">
+					and actual_return_date is  null
+				</isEqual>
+				<isEqual property="type" compareValue="N">
+					and actual_return_date is not null
+				</isEqual>														
+			  </dynamic>			  
+			  ) A, books B
+		where
+			A.book_id = B.id
+		and rn >= #beginIndex# and rn &lt;= #endIndex#		
+	</select>	
+
+	<select id="getRentalBookByUserId" parameterClass="PagingCriteria" resultClass="BookRental">
+
+		select
+			id, rentalDate, expectedReturnDate, actualReturnDate, extraDelayCount, "book.name", delayDate, "user.id", "user.name"
+		from (select row_number() over (order by rentalDate asc) rn, 
+			  	id, rentalDate, expectedReturnDate, actualReturnDate, extraDelayCount, "book.name", delayDate, "user.id", "user.name"
+			  from (select
+						A.id						as id,
+						A.rental_date				as rentalDate,
+						A.expected_return_date		as expectedReturnDate,
+						A.actual_return_date		as actualReturnDate,
+						A.extra_delay_count			as extraDelayCount,
+						B.name						as "book.name",
+						trunc(sysdate - A.expected_return_date) as delayDate,
+						A.user_id					as "user.id",
+						C.name						as "user.name"			
+					from book_rentals A, books B, users C
+					where A.book_id = B.id
+					and A.user_id = C.id
+					and A.user_id = #userId#
+					<dynamic>					
+						<isEqual property="type" compareValue="R">
+							and A.actual_return_date is  null
+						</isEqual>
+						<isEqual property="type" compareValue="N">
+							and A.actual_return_date is not null
+						</isEqual>
+						<isNotNull property="userId">
+							and A.user_id = #userId#		
+						</isNotNull>									
+					</dynamic>
+					)
+			)
+		where rn >= #beginIndex# and rn &lt;= #endIndex#
+	</select>
+	
+	<update id="delayUpdateById" parameterClass="int">
+		update book_rentals
+		set 
+			expected_return_date = expected_return_date + 7,
+			EXTRA_DELAY_COUNT = EXTRA_DELAY_COUNT + 1
+		where
+			id = #value#		
+	</update>
+
+	<select id="latestBookRental" parameterClass="int" resultClass="BookRental">
+		select 
+				R.id					as id,
+				R.rental_date			as rentalDate,
+				R.expected_return_date	as expectedReturnDate,
+				R.actual_return_date	as actualReturnDate,
+				R.extra_delay_count		as extraDelayCount,
+				R.updated_at			as updatedAt,
+				R.created_at			as createdAt
+		from books B, BOOK_RENTALS R
+		where B.id = R.BOOK_ID
+		and R.id = (select id
+            		from BOOK_RENTALS
+            		where book_id = #value#
+            		and to_char(RENTAL_DATE, 'yyyymmdd') = (select to_char(max(rental_date), 'yyyymmdd')
+	                                                        from book_rentals
+	                                                        where book_id = #value#))
+	</select>
+
+	<update id="returnBook" parameterClass="int">
+		update
+			book_rentals
+		set
+			actual_return_date = sysdate
+		where
+			id = #value#
+	</update>
+	
+
+</sqlMap>

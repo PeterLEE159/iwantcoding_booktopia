@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookRentalPenalty">
+
+	<typeAlias alias="BookRentalPenalty" type="kr.go.booktopia.vo.BookRentalPenalty"/>
+	
+	<insert id="create" parameterClass="BookRentalPenalty">
+		insert into
+			BOOK_RENTAL_PENALTIES (ID, delay_date, START_DATE, END_DATE, USER_ID)
+		values (
+			SEQ_BOOK_RENTAL_PENTALTY.NEXTVAL,
+			#delayDate#,
+			sysdate,
+			sysdate + 7,			
+			#user.id#
+		)
+	</insert>		
+	
+	
+</sqlMap>

@@ -1,0 +1,368 @@
+@CHARSET "UTF-8";
+@import url("https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css");
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css");
+@import url("https://fonts.googleapis.com/earlyaccess/nanumpenscript.css");
+@import url("http://fonts.googleapis.com/earlyaccess/jejugothic.css");
+@import url("http://fonts.googleapis.com/earlyaccess/jejumyeongjo.css");
+@import url("https://fonts.googleapis.com/earlyaccess/kopubbatang.css");
+@import url("https://fonts.googleapis.com/earlyaccess/nanumbrushscript.css");
+@import url("https://fonts.googleapis.com/earlyaccess/notosanskr.css");
+@import url("https://fonts.googleapis.com/earlyaccess/hanna.css");
+@import url("https://fonts.googleapis.com/earlyaccess/jejuhallasan.css");
+
+
+*{margin: 0;padding: 0;}
+.f-nanum{font-family:'Nanum Pen Script', cursive}
+.f-gothic{font-family:'Jeju Gothic', sans-serif}
+.f-myeongjo{font-family:'Jeju Myeongjo', serif}
+.f-kopub{font-family:'KoPub Batang', serif}
+.f-nanum-brush{font-family:'Nanum Brush Script', cursive}
+.f-noto-sans,p,a,span{font-family:'Noto Sans KR', sans-serif}
+.f-hanna,h1,h2,h3,h4,h5,h6{font-family:'Hanna', sans-serif}
+.f-jeju-hallasan{font-family:'Jeju Hallasan', cursive}
+
+
+#footer{
+	border-top:1px solid #CDCDCD; 
+	background:#fff; 
+	display:none; 
+	height: 90px;
+}
+
+#footer .row {
+	padding-top: 25px;
+}
+#footer img {
+	height: 40px;
+	width: auto;
+}
+
+footer address{
+	font-size:16px;
+}
+
+
+
+h1,h2,h3,h4,h5,h6{
+	text-transform:uppercase;
+	color:#292F36
+}
+
+li {
+	list-style: none;
+}
+
+.back {
+	height:600px; 
+ 	background: #ffffff url("/images/bg-sky-pattern.jpg");
+	margin-bottom:20px;
+	overflow: hidden;
+}
+
+.navbar{
+	border: none; 
+	margin: 0; 
+	border-radius:0;
+}
+
+
+
+.main h1, .main h2, .main h3, .main h4, .main h5, .main h6, .main p, .main a{
+	color: #fff;
+}
+
+
+.pobook ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.pobook ul li{
+	display: inline-block;
+	width: 16%;
+	margin: 0px 12px;
+}
+
+.pobook ul li:first-child {
+	margin-left: 0;
+}
+
+
+
+.pobook ul img {
+	width: 100%;
+	height: 180px;
+}
+
+.pobook ul li {
+	cursor: pointer;	
+}
+
+.carousel-control.left, .carousel-control.right {
+	background-image:none;
+}
+
+.notice {border: 1px solid lightgray;}
+.notice h2{margin-top: 10px;}
+.notice h2 a {font-size:24px; color:black;}
+.notice ul {padding: 0;}
+
+
+
+.side {margin-right:20px;}
+.side h3 {margin-top: 50px;}
+.contents h3 {margin-top: 50px;}
+.contents h3+p {border:2px solid lightgray; padding: 5px;}
+.deser {padding-bottom: 5px; border-bottom: 1px solid black; margin-bottom: 5px;}
+
+.booklist li{padding:10px 0; border-bottom: 1px dotted silver; overflow: hidden;}
+.booklist li div{float: left; margin-right:30px;}
+.booklist dl{float: left;}
+.booklist dt{margin-bottom: 10px; font-size:18px;}
+.booklist dt a{cursor:pointer; color:black;}
+.canc{margin-top: 20px;}
+
+.newbooklist {overflow: hidden;}
+.newbooklist li{float: left;margin-left:35px;}
+.newbooklist li:first-child{margin-left:130px;}
+
+.broption {margin-left:0px; padding: 3px 0;}
+
+#genre-selector {
+	padding: 12px;
+	border: 1px solid #CDCDCD;
+	overflow: hidden;
+}
+
+#genre-selector div {
+	padding-left: 32px;
+}
+
+.v-book-div {
+	display: inline-block;
+	width: 17%;
+	margin: 24px 64px 64px 64px; 
+	border-right: 3px #CDCDCD solid;
+	border-bottom: 3px #CDCDCD solid;
+}
+
+.top-buffer {
+	margin-top: 25px !important;
+}
+.right-buffer {
+	margin-right: 25px !important;
+}
+.left-buffer {
+	margin-left: 25px !important;
+}
+.bottom-buffer {
+	margin-bottom: 25px !important;
+}
+
+.a-unstyle {
+	color: #353535;
+	text-decoration: none;
+}
+.a-unstyle:hover {
+	text-decoration: none;
+}
+
+.v-book-div img {
+	width: 100%;
+	height: auto;
+}
+
+.v-book-div *{
+	font-size: small;
+}
+.h-book-div *{
+	font-size: medium;
+}
+
+.v-book-div, .h-book-div {
+	cursor: pointer;
+}
+
+
+.v-book-div:hover, .h-book-div:hover{
+	
+}
+
+.h-book-div {
+	display: block;
+	margin-bottom: 36px;
+	border-bottom: 3px #EEEEE solid;
+	padding: 12px 0;
+	overflow: hidden;
+}
+.h-book-div img {
+	float: left;
+	width: 20%;
+	height: auto;
+	vertical-align: center;
+}
+
+.h-desc {
+	float: right;
+	width: 70%;
+	height: 100%;
+	margin: 0;
+	padding: 48px 24px;
+	max-height: 250px;
+}
+
+
+
+.rating {
+    unicode-bidi:bidi-override;
+    direction:rtl;
+}
+.rating span.star {
+    font-family:FontAwesome;
+    font-weight:normal;
+    font-style:normal;
+    display:inline-block;
+}
+.rating span.star-hover:hover {
+    cursor:pointer;
+}
+.rating span.star:before {
+    content:"\f006";
+    color:#999999;
+}
+.rating span.star-hover:hover:before, 
+.rating span.star-hover:hover~span.star:before {
+    content:"\f005";
+    color:#2fa4e7;
+}
+
+span.star.filled { 
+	color:#2fa4e7; 
+	content:"\f005";
+}
+span.star.filled:before{ 
+	color:#2fa4e7;
+	content:"\f005";
+}
+
+span.rating {
+	overflow: hidden;
+	max-height: 30px;
+}
+
+
+/* 주말작업 */
+
+input.style-check[type=checkbox] {  
+    display: none;  
+}
+
+input.style-check[type=checkbox] + label{
+    display: inline-block;  
+    cursor: pointer;  
+    position: relative;  
+    padding-left: 25px;  
+    margin-right: 15px;  
+    font-size: 13px;
+}
+
+input.style-check[type=checkbox]+ label:before {     
+	content: "\2713";  /* 체크모양 */
+	color: #EEEEEE;
+	
+	
+    content: "";  
+    display: inline-block;  
+  
+    width: 20px;  
+    height: 20px;  
+  
+    margin-right: 10px;  
+    position: absolute;  
+    left: 0;  
+    bottom: 1px;  
+    background-color: #ccc;  
+    border-radius: 2px; 
+    box-shadow: inset 0px 1px 1px 0px rgba(0, 0, 0, .3), 0px 1px 0px 0px rgba(255, 255, 255, .8);  
+}
+input.style-check[type=checkbox]:checked + label:before {
+    content: "\2713";  /* 체크모양 */
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);  
+    font-size: 18px; 
+    font-weight:800; 
+    color: #fff;
+    background:#2f87c1;
+    text-align: center;  
+    line-height: 18px;
+}
+.right-g {
+	margin-right: 12px; !important;
+}
+
+.green-text {
+	color: #82ba44;
+}
+
+#section-intro {
+	background: #777777;
+	text-align: left;
+	margin-top: 48px;
+	padding: 30px 0;
+}
+
+#section-intro h3, #section-intro h4 {
+	color: #fff;
+}
+
+
+#section-intro img {
+	height: 180px;
+	width: auto;
+}
+
+
+
+.white-text {
+	color: #fff;
+}
+#section-enquire {
+	padding: 60px 0px;
+}
+#section-sponsor {
+	padding: 30px 0;
+}
+
+#map {
+	width: 100%;
+	height: 400px;
+}
+
+.font-white {
+	color: #fff;
+}
+
+#section-calendar {
+	height: 320px;
+	margin-top: 100px;
+}
+
+.hasEvent {
+    background-color: #2fa4e7 !important;
+    color: white !important;
+    content: 
+}
+
+.fc-body {
+	cursor: pointer;
+}
+
+#table-booking-body img {
+	width: auto;
+	height: 30px;
+}
+
+#book-container img {
+	max-height: 300px;
+}

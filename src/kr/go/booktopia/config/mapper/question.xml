@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="Question">
+	<typeAlias alias="Question" type="kr.go.booktopia.vo.Question"/>
+	
+	<insert id="create" parameterClass="Question">
+		insert into
+			questions (ID, TITLE, CONTENT, VIEW_COUNT, USER_ID)
+		values
+			(SEQ_QUESTION.NEXTVAL, #title#, #content#, #viewCount#, #user.id#)
+	</insert>
+	
+	<select id="read" parameterClass="int" resultClass="Question">
+		select 
+			Q.id						as id,
+			Q.title						as title,
+			Q.content					as content,
+			Q.view_count				as viewCount,
+			Q.active					as charIsActive,
+			Q.updated_at			as updatedAt,
+			Q.created_at				as createdAt,
+			U.id						as "user.id",
+			U.name					as "user.name"
+		from
+			questions Q, users U
+		where 
+			Q.id = #value# and
+			Q.user_id = U.id(+)
+	</select>
+	
+	<select id="getNextQuestion" parameterClass="int" resultClass="Question">
+		select Q.id						as id,
+				Q.title						as title,
+				Q.content					as content,
+				Q.view_count				as viewCount,
+				Q.active					as charIsActive,
+				Q.updated_at				as updatedAt,
+				Q.created_at				as createdAt,
+				U.id						as "user.id",
+				U.name						as "user.name"
+		from questions Q, users U
+		where
+				 Q.user_id = U.id
+		 		and Q.id = (select min(id)
+		 					from questions
+		 					where id>#value#
+		 					and active = 'Y')
+	</select>
+	
+	<select id="getPreQuestion" parameterClass="int" resultClass="Question">
+		select Q.id						as id,
+				Q.title						as title,
+				Q.content					as content,
+				Q.view_count				as viewCount,
+				Q.active					as charIsActive,
+				Q.updated_at				as updatedAt,
+				Q.created_at				as createdAt,
+				U.id						as "user.id",
+				U.name						as "user.name"
+		from questions Q, users U
+		where
+				 Q.user_id = U.id
+		 		and Q.id = (select max(id)
+		 					from questions
+		 					where id&lt;#value#
+		 					and active = 'Y')
+	</select>
+	
+	<select id="getTotalRows" parameterClass="Criteria" resultClass="int">
+		select count(*)
+		from questions Q, Users U
+		where Q.user_id = U.id
+		<dynamic>
+			<isNotNull property="opt">
+				<isNotNull property="keyword">
+					<isEqual property="opt" compareValue="title">
+						and Q.title like '%' || #keyword# || '%'
+					</isEqual>
+					<isEqual property="opt" compareValue="writer">
+						and U.name like '%' || #keyword# || '%'
+					</isEqual>
+				</isNotNull>
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<select id="list" parameterClass="Criteria" resultClass="Question">
+		
+		select id, title, content, viewCount, charIsActive, updatedAt, createdAt, "user.id", "user.name"
+		from (select row_number() over (order by createdAt desc) rn,
+						id, title, content, viewCount, charIsActive, updatedAt, createdAt, "user.id", "user.name"
+				from (select
+							Q.id							as id,
+							Q.title							as title,
+							Q.content						as content,
+							Q.view_count					as viewCount,
+							Q.active						as charIsActive,
+							Q.updated_at				as updatedAt,
+							Q.created_at					as createdAt,
+							U.id							as "user.id",
+							U.name						as "user.name"
+						from
+							questions Q, users U
+						where
+							Q.user_id = U.id
+						and Q.active = 'Y'
+						<dynamic>
+							<isNotNull property="opt">
+								<isNotNull property="keyword">
+									<isEqual property="opt" compareValue="title">
+										and Q.title like '%' || #keyword# || '%'
+									</isEqual>
+									<isEqual property="opt" compareValue="writer">
+										and U.name like '%' || #keyword# || '%'
+									</isEqual>
+								</isNotNull>
+							</isNotNull>
+						</dynamic>
+						))
+		where rn >=#beginIndex# and rn &lt;=#endIndex#
+	</select>
+	
+	<update id="update" parameterClass="Question">
+		update
+			questions
+		set
+			TITLE = #title#,
+			CONTENT = #content#,
+			view_count = #viewCount#
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="Question">
+		update
+			questions
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="Question">
+		update
+			questions
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+</sqlMap>

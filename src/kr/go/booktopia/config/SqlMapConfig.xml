@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+  
+  <!--  트랜잭션 처리를 위한 Connection Pool 생성에 필요한 DB연결 정보 설정  -->
+  <settings useStatementNamespaces="true"/>
+  <transactionManager type="JDBC" commitRequired="false">  	
+    <dataSource type="SIMPLE">
+      <property name="JDBC.Driver" value="oracle.jdbc.OracleDriver"/>
+      <property name="JDBC.ConnectionURL" value="jdbc:oracle:thin:@localhost:1521:orcl"/>
+      <property name="JDBC.Username" value="booktopia"/>
+      <property name="JDBC.Password" value="zxcv1234"/>
+    </dataSource>
+  </transactionManager>
+  
+  <sqlMap resource="kr/go/booktopia/config/mapper/user.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/board.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/board_comment.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_writers.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_wish.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_translator.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_comment.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_genre.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_rental.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_rental_penalties.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_publisher.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_recommend.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/book_booking.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/announcement.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/question.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/genre.xml"/>
+  <sqlMap resource="kr/go/booktopia/config/mapper/question_answer.xml"/>
+
+</sqlMapConfig>

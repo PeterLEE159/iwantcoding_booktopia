@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="User">
+	<typeAlias alias="User" type="kr.go.booktopia.vo.User" />
+	<typeAlias alias="Criteria" type="kr.go.booktopia.vo.Criteria" />
+
+	<resultMap class="User" id="UserResult">
+		<result property="id" column="ID" />
+		<result property="userId" column="USER_ID" />
+		<result property="password" column="PASSWORD" />
+		<result property="name" column="NAME" />
+		<result property="email" column="EMAIL" />
+		<result property="phone" column="PHONE" />
+		<result property="charIsAdmin" column="ADMIN" />
+		<result property="charIsActive" column="ACTIVE" />
+		<result property="updatedAt" column="UPDATED_AT" />
+		<result property="createdAt" column="CREATED_AT" />
+	</resultMap>
+
+
+
+	<insert id="create" parameterClass="User">
+		insert into
+		users (ID, USER_ID, PASSWORD, NAME, EMAIL, PHONE)
+		values
+		(SEQ_USER.NEXTVAL, #userId#, #password#, #name#, #email#, #phone#)
+	</insert>
+
+	<select id="read" parameterClass="int" resultMap="UserResult">
+		select * from
+		users
+		where
+		id = #value#
+	</select>
+	<select id="readByUid" parameterClass="String" resultMap="UserResult">
+		select
+		* from
+		users
+		where
+		user_id = #value#
+	</select>
+
+	<update id="update" parameterClass="User">
+		update
+		users
+		set
+		password = #password#,
+		name = #name#,
+		email = #email#,
+		phone = #phone#,
+		updated_at = sysdate
+		where
+		id = #id#
+	</update>
+
+	<update id="delete" parameterClass="User">
+		update
+		users
+		set
+		active = 'N',
+		UPDATED_AT = sysdate
+		where
+		id = #id#
+	</update>
+
+	<update id="active" parameterClass="int">
+		update
+		users
+		set
+		active = 'Y',
+		UPDATED_AT = sysdate
+		where
+		id = #id#
+	</update>
+
+	<update id="nonActive" parameterClass="int">
+		update
+		users
+		set
+		active = 'N',
+		UPDATED_AT = sysdate
+		where
+		id = #id#
+	</update>
+	<select id="allUser" parameterClass="User" resultMap="UserResult">
+		select *
+		from users
+		where name=#name# and email=#email#
+	</select>
+
+	<select id="searchPwd" parameterClass="User" resultMap="UserResult">
+		select *
+		from users
+		where user_id=#userId# and name=#name# and email=#email#
+	</select>
+
+	<update id="updatePwd" parameterClass="User">
+		update users set
+		password=#password# where id=#id#
+	</update>
+	<update id="updatePwds" parameterClass="User">
+		update users set
+		password=#password# where user_id=#userId#
+	</update>
+
+	<select id="allMembers" resultMap="UserResult">
+		select *
+		from users
+	</select>
+
+	<select id="searchUserId" parameterClass="String" resultMap="UserResult">
+		select *
+		from users
+		where user_id=#value#
+	</select>
+
+	<select id="getTotalRows" parameterClass="Criteria" resultClass="int">
+		select count(*)
+		from users
+		<dynamic>
+			<isNotEmpty prepend="where" property="keyword">
+				<isEqual property="opt" compareValue="username">
+					name like '%' ||
+					#keyword# || '%'
+				</isEqual>
+				<isEqual property="opt" compareValue="userno">
+					id = #keyword#
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getUsers" parameterClass="Criteria" resultClass="User">
+
+		select id as id,
+		name as name,
+		phone as phone,
+		email as email,
+		created_at as createdAt,
+		active as charIsActive
+
+		from (select row_number() over (order by created_at asc) rn,
+		id, name, phone, email, created_at, active
+		from users
+
+		<dynamic>
+			<isNotEmpty prepend="where" property="keyword">
+				<isEqual property="opt" compareValue="username">
+					name like '%' ||
+					#keyword# || '%'
+				</isEqual>
+				<isEqual property="opt" compareValue="userno">
+					id = #keyword#
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+		)
+		where rn >= #beginIndex# and rn &lt;= #endIndex#
+	</select>
+
+</sqlMap>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookComment">
+	<typeAlias alias="BookComment" type="kr.go.booktopia.vo.BookComment"/>
+	<typeAlias alias="Criteria" type="kr.go.booktopia.vo.Criteria"/>
+	<insert id="create" parameterClass="BookComment">
+		insert into
+			book_comments (ID, "CONTENT", RATING_POINT, USER_ID, BOOK_ID)
+		values (
+			SEQ_BOOK_COMMENT.NEXTVAL,
+			#content#,
+			#ratingPoint#,
+			#user.id#,
+			#book.id#
+		)
+	</insert>
+	
+	
+	
+	<update id="update" parameterClass="BookComment">
+		update
+			book_comments
+		set
+			CONTENT = #content#
+		where
+			id = #id#
+	</update>
+	
+	<select id="list" parameterClass="Criteria" resultClass="BookComment">
+		select
+			C.id			as id,
+			C.content		as content,
+			C.rating_point	as ratingPoint,
+			C.active		as charIsActive,
+			U.id			as "user.id",
+			U.name			as "user.name",
+			C.created_at	as "createdAt"
+		from
+			book_comments C,
+			users U
+		where 
+			C.user_id = U.id and 
+			C.book_id = #bookId# and
+			C.active = 'Y'
+		order by 
+			C.created_at desc
+	</select>
+	
+	
+	<update id="delete" parameterClass="BookComment">
+		update
+			book_comments
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="BookComment">
+		update
+			book_comments
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+</sqlMap>

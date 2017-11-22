@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BoardComment">
+	<typeAlias alias="BoardComment" type="kr.go.booktopia.vo.BoardComment"/>
+	
+	<insert id="create" parameterClass="BoardComment">
+		insert into
+			board_comments (ID, "CONTENT", BOARD_ID, USER_ID)
+		values
+			(SEQ_BOARD_COMMENT.NEXTVAL, #content#, #board.id#, #user.id#)
+	</insert>
+	
+	<select id="read" parameterClass="int" resultClass="BoardComment">
+		select 
+			B.id						as id,
+			B.content					as content,
+			B.active					as charIsActive,
+			B.updated_at				as updatedAt,
+			B.created_at				as createdAt,
+			U.id						as "user.id",
+			U.name						as "user.name"
+		from
+			board_comments B, users U
+		where 
+			B.id = #value# and
+			B.user_id = U.id(+)
+	</select>
+	
+	<update id="update" parameterClass="BoardComment">
+		update
+			board_comments
+		set
+			CONTENT = #content#,
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="BoardComment">
+		update
+			board_comments
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="BoardComment">
+		update
+			board_comments
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+</sqlMap>

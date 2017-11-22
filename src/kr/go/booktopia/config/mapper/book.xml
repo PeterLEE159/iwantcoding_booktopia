@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="Book">
+	<typeAlias alias="Book" type="kr.go.booktopia.vo.Book"/>
+	<typeAlias alias="Criteria" type="kr.go.booktopia.vo.Criteria"/>
+	<insert id="create" parameterClass="Book">
+		insert into
+			books (ID, NAME, "CONTENT", IMAGE_URL, PREVIEW_URL, PUBLISH_DATE, PUBLISHER_ID, WRITER_ID, TRANSLATOR_ID)
+		values (
+			#id#,
+			#name#,
+			#content#,			
+			#imageUrl#,
+			#previewUrl#,
+			#publishDate#,
+			#publisher.id#,
+			#writer.id#,
+			#translator.id#
+		)
+	</insert>
+	
+	<select id="getBookNextVal" resultClass="int">
+		select SEQ_BOOK.NEXTVAL from dual
+	</select>
+	
+	
+	<select id="read" parameterClass="int" resultClass="Book">
+		select 
+			B.id			as id,
+			B.name			as name,
+			B.content		as content,
+			B.image_url		as imageUrl,
+			B.rental		as strRental,
+			B.publish_date	as publishDate,
+			B.preview_url	as previewUrl,
+			B.view_count	as viewCount,
+			B.updated_at	as updatedAt,
+			B.created_at	as createdAt,
+			P.id			as "publisher.id",
+			P.name			as "publisher.name",
+			W.id			as "writer.id",
+			W.name			as "writer.name",
+			T.id			as "translator.id",
+			T.name			as "translator.name",
+			book_genre_fn(B.id) as genre, 
+			
+			round(nvl((select avg(rating_point) from book_comments
+			 where 
+			 	book_id = B.id
+			 group by 
+			 	book_id), 0), 1) as ratingPoint,
+			 	
+			 nvl((select count(*) from book_rentals
+			 where
+			 	book_id = B.id
+			 	group by book_id), 0) as rentalCount,
+			 	
+			 nvl((select count(*) from book_recommends
+			 where
+			 	book_id = B.id and
+			 	active = 'Y'
+			 group by 
+			 	book_id), 0) as recommendCount
+		from
+			books B,
+			book_publishers P,
+			book_writers	W,
+			book_translators T
+		where
+			B.id = #value# and
+			B.publisher_id = P.id(+) and
+			B.writer_id = W.id(+) and
+			B.translator_id = T.id(+)
+	</select>
+	
+	<select id="search" parameterClass="Criteria" resultClass="Book">
+		select 
+			distinct id, 
+			name,
+			imageUrl,
+			"writer.id", 
+			"writer.name", 
+			"publisher.id", 
+			"publisher.name",
+			book_genre_fn(id) as genre, 
+			viewCount, 
+			round(nvl((select avg(rating_point) from book_comments
+				where 
+					B.id = book_id(+)
+				group by 
+					book_id), 0), 1) as ratingPoint,
+			(select count(*) from book_rentals where B.id = book_id(+)) as rentalCount,
+			(select count(*) from book_recommends where B.id = book_id(+)) as recommendCount
+ 		from
+			(select 
+				B.id, 
+				B.name, 
+				B.view_count 	as viewCount, 
+				B.image_url		as imageUrl, 
+				W.id 			as "writer.id", 
+				W.name 			as "writer.name", 
+				P.id 			as "publisher.id", 
+				P.name 			as "publisher.name",
+				row_number() over (order by B.created_at desc) rn 
+			from
+				books B, 
+				book_writers W, 
+				book_publishers P, 
+				book_genre BG, 
+				genre G
+			where B.writer_id = W.id
+				and B.publisher_id = P.id
+				and B.id = BG.book_id
+				and BG.genre_id = G.id
+				<dynamic>
+		        	<isNotNull property="opt">
+		            	<isNotNull property="keyword">
+		               		<isEqual property="opt" compareValue="name">
+		                  		and B.name like '%' || #keyword# || '%'
+		               		</isEqual>
+		               		<isEqual property="opt" compareValue="writer">
+		                  		and W.name like '%' || #keyword# || '%'
+		               		</isEqual>
+		               		<isEqual property="opt" compareValue="publisher">
+		                  		and P.name like '%' || #keyword# || '%'
+		               		</isEqual>
+		            	</isNotNull>
+		         	</isNotNull>
+		         	<isNotNull property="ids">
+		         		and BG.genre_id in 
+		         		<iterate property="ids" open="(" close=")" conjunction=",">
+		         			#ids[]#
+		         		</iterate>
+		         	</isNotNull>
+		      	</dynamic>
+			) B
+		where
+			rn between #beginIndex# and #endIndex#
+			
+	</select>
+	
+	<select id="readLatestBook" parameterClass="Criteria" resultClass="Book">
+		select 
+			id,
+			name,
+			content,
+			strRental,
+			imageUrl,
+			publishDate,
+			previewUrl,
+			updatedAt,
+			createdAt,
+			viewCount,
+			book_genre_fn(id) as genre,
+			"publisher.id",
+			"publisher.name",
+			"writer.id",
+			"writer.name",
+			"translator.id",
+			"translator.name",
+			round(nvl((select avg(rating_point) from book_comments
+				 where 
+				 	book_id = B.id
+				 group by
+				 	book_id), 0), 1) as ratingPoint
+		from
+			(select 
+				B.id			as id,
+				B.name			as name,
+				B.content		as content,
+				B.rental		as strRental,
+				B.image_url		as imageUrl,
+				B.publish_date	as publishDate,
+				B.preview_url	as previewUrl,
+				B.updated_at	as updatedAt,
+				B.created_at	as createdAt,
+				B.view_count	as viewCount,
+				P.id			as "publisher.id",
+				P.name			as "publisher.name",
+				W.id			as "writer.id",
+				W.name			as "writer.name",
+				T.id			as "translator.id",
+				T.name			as "translator.name",
+				row_number() over (order by B.created_at desc) rn
+			from
+				books B,
+				book_publishers P,
+				book_writers	W,
+				book_translators T
+			where
+				B.publisher_id = P.id(+) and
+				B.writer_id = W.id(+) and
+				B.translator_id = T.id(+)) B
+				where rn between #beginIndex# and #endIndex#
+	</select>
+		
+	<update id="update" parameterClass="Book">
+		update
+			books
+		set
+			NAME = #name#,
+			CONTENT = #content#,
+			VIEW_COUNT = #viewCount#,
+			RENTAL = #strRental#,
+			IMAGE_URL = #imageUrl#,
+			PREVIEW_URL = #previewUrl#,
+			PUBLISH_DATE = #publishDate#,
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="Book">
+		update
+			books
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="Book">
+		update
+			books
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="addViewCount" parameterClass="Book">
+		update
+			books
+		set
+			view_count = #viewCount#
+		where
+			id = #id#
+	</update>
+	
+	
+	<!-- 주말작업 추가 -->
+	<select id="readByRentalCount" resultClass="Book" parameterClass="Criteria">
+		select 
+			B.id, 
+			B.name,
+			B.image_url 		as "imageUrl",
+			R.rental_count	as "rentalCount",
+			P.name				as "publisher.name",
+			W.name				as "writer.name"
+		from 
+			(select count(*) as rental_count, book_id, row_number() over (order by count(*) desc) as rn
+			from 
+				book_rentals
+			group by 
+				book_id) R, books B, book_publishers P, book_writers W
+		where 
+			rn between #beginIndex# and #endIndex#
+			and R.book_id = B.id
+			and B.publisher_id = P.id
+			and B.writer_id = W.id
+	</select>
+	
+	<select id="readByRecommendCount" resultClass="Book" parameterClass="Criteria">
+		select 
+			B.id, 
+			B.name,
+			B.image_url 		as "imageUrl",
+			R.recommend_count	as "recommendCount",
+			P.name				as "publisher.name",
+			W.name				as "writer.name"
+		from 
+			(select count(*) as recommend_count, book_id, row_number() over (order by count(*) desc) as rn
+			from 
+				book_recommends
+			group by 
+				book_id) R, books B, book_publishers P, book_writers W
+		where 
+			rn between #beginIndex# and #endIndex#
+			and R.book_id = B.id
+			and B.publisher_id = P.id
+			and B.writer_id = W.id
+	</select>
+	
+	<select id="getTotalRows" parameterClass="Criteria" resultClass="int">
+		select count(*)
+		from
+			books B,
+			book_publishers P,
+			book_writers	W
+		where
+			B.publisher_id = P.id(+) and
+			B.writer_id = W.id(+) 
+		<dynamic>
+        	<isNotNull property="opt">
+            	<isNotNull property="keyword">
+               		<isEqual property="opt" compareValue="name">
+                  		and B.name like '%' || #keyword# || '%'
+               		</isEqual>
+               		<isEqual property="opt" compareValue="writer">
+                  		and W.name like '%' || #keyword# || '%'
+               		</isEqual>
+               		<isEqual property="opt" compareValue="publisher">
+                  		and P.name like '%' || #keyword# || '%'
+               		</isEqual>
+            	</isNotNull>
+         	</isNotNull>
+		</dynamic>
+	</select>
+	
+	<select id="getBooks" parameterClass="Criteria" resultClass="Book">
+		select id, name, "writer.name", "publisher.name", rental
+		from (select ROW_NUMBER() over (order by id desc) rn,  
+			  id, name, "writer.name", "publisher.name", rental  
+			  from (select 
+							B.id			as id,
+							B.name			as name,
+							P.name			as "publisher.name",
+							B.rental		as rental,
+							W.name			as "writer.name"
+					from
+						books B,
+						book_publishers P,
+						book_writers W
+					where 
+						B.publisher_id = P.id(+) and
+						B.writer_id = W.id(+)
+						<dynamic>
+				        	<isNotNull property="opt">
+				            	<isNotNull property="keyword">
+				               		<isEqual property="opt" compareValue="name">
+				                  		and B.name like '%' || #keyword# || '%'
+				               		</isEqual>
+				               		<isEqual property="opt" compareValue="writer">
+				                  		and W.name like '%' || #keyword# || '%'
+				               		</isEqual>
+				               		<isEqual property="opt" compareValue="publisher">
+				                  		and P.name like '%' || #keyword# || '%'
+				               		</isEqual>
+				            	</isNotNull>
+				         	</isNotNull>
+						</dynamic>
+						order by B.id asc))
+		where rn >=#beginIndex# and rn &lt;=#endIndex#
+	</select>
+	
+	<update id="bookUpdate" parameterClass="Book">
+		update
+			books
+		set
+			name = #name#,
+			<dynamic>
+				<isNotNull property="imageUrl">
+					image_url = #imageUrl#,	
+				</isNotNull>
+			</dynamic>
+			content = #content#,
+			publish_date = #publishDate#
+		where
+			id = #id#
+	</update>
+	
+</sqlMap>

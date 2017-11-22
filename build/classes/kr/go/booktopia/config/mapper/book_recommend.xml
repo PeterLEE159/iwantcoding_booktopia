@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookRecommend">
+	<typeAlias alias="BookRecommend" type="kr.go.booktopia.vo.BookRecommend"/>
+	
+	
+	
+	<insert id="create" parameterClass="BookRecommend">
+		insert into
+			book_recommends (ID, BOOK_ID,USER_ID)
+		values
+			(SEQ_BOOK_RECOMMEND.NEXTVAL, #bookId#, #userId#)
+	</insert>
+	
+	<select id="read" parameterClass="int" resultClass="BookRecommend">
+		select 
+			id						as id,
+			active					as charIsActive,
+			updated_at				as updatedAt,
+			created_at				as createdAt,
+			book_id					as bookId,
+			user_id					as userId
+		from
+			book_recommends
+		where 
+			id = #value#
+			
+	</select>
+	
+	<select id="search" parameterClass="Criteria" resultClass="BookRecommend">
+		select 
+			id						as id,
+			active					as charIsActive,
+			updated_at				as updatedAt,
+			created_at				as createdAt,
+			book_id					as bookId,
+			user_id					as userId
+		from
+			book_recommends
+		where 
+			book_id = #bookId# and
+			user_id = #userId#
+	</select>
+	
+	<update id="update" parameterClass="BookRecommend">
+		update
+			book_recommends
+		set
+			BOOK_ID = #bookId#,
+			USER_ID = #userId#,
+			ACTIVE = #charIsActive#,
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="BookRecommend">
+		update
+			book_recommends
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="BookRecommend">
+		update
+			book_recommends
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+</sqlMap>

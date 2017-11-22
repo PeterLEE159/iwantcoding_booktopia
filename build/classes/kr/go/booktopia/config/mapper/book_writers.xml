@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookWriters">
+	<typeAlias alias="BookWriters" type="kr.go.booktopia.vo.BookWriters"/>
+	
+	
+	<insert id="create" parameterClass="BookWriters">
+		insert into
+			book_writers (ID, NAME, PHONE, EMAIL)
+		values
+			(SEQ_BOOK_WRITER.NEXTVAL, #name#, #phone#, #email#)
+	</insert>
+	
+	<select id="getseq" resultClass="int">
+		select 
+			SEQ_BOOK_WRITER.currval
+		from
+			dual
+	</select>
+	
+	<select id="list" resultClass="BookWriters">
+		select 
+			id						as id,
+			name					as name,
+			phone					as phone,
+			email					as email,
+			active					as charIsActive,
+			updated_at				as updatedAt,
+			created_at				as createdAt
+		from
+			book_writers					
+	</select>
+	
+	<select id="read" parameterClass="int" resultClass="BookWriters">
+		select 
+			id						as id,
+			name					as name,
+			phone					as phone,
+			email					as email,
+			active					as charIsActive,
+			updated_at				as updatedAt,
+			created_at				as createdAt
+		from
+			book_writers
+		where 
+			id = #value#			
+	</select>
+	
+	<update id="update" parameterClass="BookWriters">
+		update
+			book_writers
+		set
+			NAME = #name#,
+			PHONE = #phone#,
+			EMAIL = #email#
+		where
+			id = #id#
+	</update>
+	
+	
+	
+	<update id="delete" parameterClass="BookWriters">
+		update
+			book_writers
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="BookWriters">
+		update
+			book_writers
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	
+	
+</sqlMap>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookBooking">
+	<typeAlias alias="BookBooking" type="kr.go.booktopia.vo.BookBooking"/>
+	<typeAlias alias="PagingCriteria" type="kr.go.booktopia.vo.PagingCriteria"/>	
+	
+	<insert id="create" parameterClass="BookBooking">
+		insert into
+			book_bookings (ID, BOOK_ID,USER_ID, BOOKING_DATE)
+		values
+			(SEQ_BOOK_BOOKING.NEXTVAL, #book.id#, #userId#, #bookingDate#)
+	</insert>
+	
+	<select id="read" parameterClass="int" resultClass="BookBooking">
+		select 
+			id						as id,
+			active					as charIsActive,
+			updated_at				as updatedAt,
+			created_at				as createdAt,
+			book_id					as "book.id",
+			user_id					as userId,
+			booking_date			as bookingDate
+		from
+			book_bookings
+		where 
+			id = #value#			
+	</select>
+	
+	<select id="getBookingById" parameterClass="int" resultClass="BookBooking">
+		select
+			A.id			as id,			
+			B.name			as "book.name",
+			W.name			as "book.writer.name",
+			T.name			as "book.translator.name",
+			P.name			as "book.publisher.name",
+			B.publish_date	as "book.publishDate",
+			B.rental		as "book.rental",
+			B.image_url		as "book.imageUrl"
+		from
+			book_bookings A, books B, book_writers W, book_translators T, book_publishers P
+		where
+			A.book_id = B.id
+		and B.writer_id = W.id
+		and B.translator_id = T.id
+		and B.publisher_id = P.id
+		and A.user_id = #value#
+		and A.active = 'Y'
+	</select>
+	
+	<select id="getBookingPagingById" parameterClass="PagingCriteria" resultClass="BookBooking">
+		select
+			A.id			as id,
+			B.id			as "book.id",
+			B.name			as "book.name",
+			W.name			as "book.writer.name",		
+			T.name			as "book.translator.name",		
+			P.name			as "book.publisher.name",
+			B.publish_date	as "book.publishDate",
+			B.rental		as "book.rental",
+			B.image_url		as "book.imageUrl"
+		from (select row_number() over (order by id asc) rn,
+			  id, user_id, book_id, active
+			  from book_bookings
+			  where active = 'Y'
+			  and user_id = #userId#) A, books B, book_writers W, book_translators T, book_publishers P
+		where
+			A.book_id = B.id
+		and B.writer_id = W.id		
+		and B.translator_id = T.id(+)		
+		and B.publisher_id = P.id		
+		and rn >= #beginIndex# and rn &lt;= #endIndex#
+	</select>
+	
+	<select id="bookingCountById" parameterClass="int" resultClass="int">
+		select
+			count(*)
+		from
+			book_bookings
+		where
+			user_id = #value#
+		and active = 'Y'
+	</select>
+	
+	<update id="delete" parameterClass="BookBooking">
+		update
+			book_bookings
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<select id="readByDate" parameterClass="Criteria" resultClass="BookBooking">
+		select
+			U.id       as userId,
+			U.user_id  as uuid,
+			BO.id,
+			B.id   as "book.id", 
+			B.name as "book.name",
+			trunc(BO.booking_date) bookingDate,
+			trunc(BO.booking_date + 7) returnDate
+		from 
+			books B, book_bookings BO, users U
+		where
+			U.id = BO.user_id and
+			B.id = BO.book_id and 
+			B.id = #bookId# and
+			BO.active = 'Y' and
+			BO.booking_date between trunc(#date#,'month') and trunc(add_months(#date#, 1), 'month')
+	</select>
+</sqlMap>

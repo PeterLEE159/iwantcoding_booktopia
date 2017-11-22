@@ -1,0 +1,77 @@
+@import url("https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css");
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css");
+
+@import url("https://fonts.googleapis.com/earlyaccess/nanumpenscript.css");
+@import url("http://fonts.googleapis.com/earlyaccess/jejugothic.css");
+@import url("http://fonts.googleapis.com/earlyaccess/jejumyeongjo.css");
+@import url("https://fonts.googleapis.com/earlyaccess/kopubbatang.css");
+@import url("https://fonts.googleapis.com/earlyaccess/nanumbrushscript.css");
+@import url("https://fonts.googleapis.com/earlyaccess/notosanskr.css");
+@import url("https://fonts.googleapis.com/earlyaccess/hanna.css");
+@import url("https://fonts.googleapis.com/earlyaccess/jejuhallasan.css");
+
+
+$primary: #2fa4e7;
+$dark: #292F36;
+$grey: #CDCDCD;
+
+.f-nanum {
+	font-family: 'Nanum Pen Script', cursive;
+}
+
+.f-gothic {
+	font-family: 'Jeju Gothic', sans-serif;
+}
+
+.f-myeongjo {
+	font-family: 'Jeju Myeongjo', serif;
+}
+
+.f-kopub {
+	font-family: 'KoPub Batang', serif;
+}
+
+.f-nanum-brush {
+	font-family: 'Nanum Brush Script', cursive;
+}
+
+.f-noto-sans {
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+.f-hanna {
+	font-family: 'Hanna', sans-serif;
+}
+
+.f-jeju-hallasan {
+	font-family: 'Jeju Hallasan', cursive;
+}
+
+footer {
+	height: 80px;
+	border-top: 1px solid $grey;
+	padding: 10px 100px;
+	img {
+		width: auto;
+		height: 60PX;
+	}
+	p {
+		font-weight: bold;
+	}
+}
+
+h1,h2,h3,h4,h5,h6 {
+	@extend .f-hanna;
+	text-transform: uppercase;
+	color: $dark;
+}
+
+p, a, span {
+	@extend .f-noto-sans;
+	text-transform: capitalize;
+	color: $dark;
+}
+
+
+

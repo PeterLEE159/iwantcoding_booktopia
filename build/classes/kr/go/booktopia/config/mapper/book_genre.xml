@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookGenre">
+	<typeAlias alias="BookGenre" type="kr.go.booktopia.vo.BookGenre"/>
+	<insert id="create" parameterClass="BookGenre">
+		insert into
+			book_genre (ID, BOOK_ID, GENRE_ID)
+		values (
+			SEQ_BOOK_GENRE.NEXTVAL,
+			#bookId#,
+			#genreId#
+		)
+	</insert>
+	
+	<select id="list" parameterClass="Criteria" resultClass="BookGenre">
+	
+		select 
+			id			as id,
+			updated_at	as updatedAt,
+			created_at	as createdAt,
+			book_id		as bookId,
+			genre_id	as genreId
+		from
+			book_genre
+		where
+			book_id = #bookId#
+	</select>
+	
+	
+	<select id="read" parameterClass="int" resultClass="BookGenre">
+		select 
+			id			as id,
+			updated_at	as updatedAt,
+			created_at	as createdAt,
+			book_id		as bookId,
+			genre_id	as genreId
+		from
+			book_genre
+		where
+			id = #value#
+	</select>
+	
+	
+	
+	
+	
+	<update id="delete" parameterClass="BookGenre">
+		update
+			book_genre
+		set
+			active = 'N',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+	
+	<update id="active" parameterClass="BookGenre">
+		update
+			book_genre
+		set
+			active = 'Y',
+			UPDATED_AT = sysdate
+		where
+			id = #id#
+	</update>
+</sqlMap>

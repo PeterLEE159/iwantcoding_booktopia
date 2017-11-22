@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!-- dtd: data type definition: 자료형 정의 -->
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+
+<sqlMap namespace="BookPublisher">
+	<typeAlias alias="BookPublisher" type="kr.go.booktopia.vo.BookPublisher"/>
+	<insert id="create" parameterClass="BookPublisher">
+		insert into
+			book_publishers (ID, NAME, PHONE, EMAIL)
+		values (
+			SEQ_BOOK_PUBLISHER.NEXTVAL,
+			#name#,
+			#phone#,
+			#email#
+		)
+	</insert>
+	
+	<select id="getseq" resultClass="int">
+		select 
+			SEQ_BOOK_PUBLISHER.currval
+		from
+			dual
+	</select>
+	
+	<select id="list" resultClass="BookPublisher">
+		select 
+			id						as id,
+			name					as name,
+			phone					as phone,
+			email					as email,
+			active					as charIsActive,
+			updated_at				as updatedAt,
+			created_at				as createdAt
+		from
+			book_publishers					
+	</select>
+</sqlMap>
